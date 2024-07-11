@@ -1,4 +1,4 @@
-package com.technoweb;
+package com.technoweb.authserver;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
