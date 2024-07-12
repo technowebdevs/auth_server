@@ -49,7 +49,7 @@ public class AuthServerController {
     }
 
     @PatchMapping("/changePassword")
-    public ResponseEntity<String> changePassword(@RequestBody ChangePasswordDto changePasswordDto) {
+    public ResponseEntity<String> changePassword(@Valid @RequestBody ChangePasswordDto changePasswordDto) {
         String successMessage = iUserService.changesPassword(changePasswordDto);
         return ResponseEntity.status(HttpStatus.OK).body(successMessage);
     }
