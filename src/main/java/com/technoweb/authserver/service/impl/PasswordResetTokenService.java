@@ -6,12 +6,14 @@ import com.technoweb.authserver.repository.PasswordResetTokenRepository;
 import com.technoweb.authserver.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.BadCredentialsException;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.security.SecureRandom;
 import java.time.LocalDateTime;
 import java.util.Base64;
 import java.util.List;
+import java.util.Optional;
 
 @Service
 public class PasswordResetTokenService {
@@ -21,6 +23,9 @@ public class PasswordResetTokenService {
 
     @Autowired
     private UserRepository userRepository;
+
+    @Autowired
+    private PasswordEncoder passwordEncoder;
 
     @Autowired
     private PasswordResetTokenRepository passwordResetTokenRepository;
@@ -52,6 +57,32 @@ public class PasswordResetTokenService {
         }
         else{
             throw new BadCredentialsException("user with username: "+username+" is not registered");
+        }
+    }
+
+    public String resetPasswordUsingToken(String password, String token) {
+        List<PasswordResetToken> passwordResetToken = passwordResetTokenRepository.findByToken(token);
+        if(!passwordResetToken.isEmpty()) {
+            PasswordResetToken prt = passwordResetToken.get(0);
+            if((!prt.isUsed()) && (!prt.getExpiryDate().isBefore(LocalDateTime.now()))) {
+                Optional<User> user = userRepository.findById(prt.getUserId());
+                if(user.isPresent()){
+                    User u = user.get();
+                    u.setPassword(passwordEncoder.encode(password));
+                    userRepository.save(u);
+                    passwordResetTokenRepository.deleteById(prt.getId());
+                    return "Password reset successfull.";
+                }
+                else {
+                    throw new RuntimeException("User not found");
+                }
+            }
+            else {
+                throw new RuntimeException("invalid or expired url");
+            }
+        }
+        else {
+            throw new RuntimeException("invalid url");
         }
     }
 
