@@ -28,7 +28,7 @@ public class TechnoWebConfig {
 //        .sessionManagement(session-> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
         .sessionManagement(sessionManagement -> sessionManagement.sessionCreationPolicy(SessionCreationPolicy.ALWAYS))
 
-                .csrf(csrf -> csrf.csrfTokenRequestHandler(requestHandler).ignoringRequestMatchers("/signup","/user","/reset-password")
+                .csrf(csrf -> csrf.csrfTokenRequestHandler(requestHandler).ignoringRequestMatchers("/signup","/user","/reset-password","/reset-technoweb-password")
                         .csrfTokenRepository(CookieCsrfTokenRepository.withHttpOnlyFalse()))
 
                 .addFilterAfter(new CsrfCookieFilter(), BasicAuthenticationFilter.class)
@@ -38,7 +38,7 @@ public class TechnoWebConfig {
                 .authorizeHttpRequests(
                 (request) -> request
                         .requestMatchers("/changePassword","/user").authenticated()
-                        .requestMatchers("/signup","/reset-password").permitAll())
+                        .requestMatchers("/signup","/reset-password","/reset-technoweb-password").permitAll())
                 .formLogin(Customizer.withDefaults())
                 .httpBasic(Customizer.withDefaults());
 
